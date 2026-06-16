@@ -9,13 +9,38 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/pee_store_db?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true}
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:root}
+
   jpa:
     hibernate:
       ddl-auto: update
 
+  # Đã đưa cấu hình mail ra đúng phân cấp thuộc nhánh 'spring'
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: huuchuong398@gmail.com
+    password: "mmwg kywb bkqv cuew"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        security: DEBUG
+
+jwt:
+  secret-base64: "kRZtO5/vUdtnabWGyd/N0CUU7h7ID4OK/OkxXi+j3Qxf7SV40PASQovBDnTIGAe4nSuonLwClVnwP1ucioXhFw=="
+  # Đã xóa bỏ phần text thừa lỗi cú pháp, cấu hình thời gian hết hạn (ví dụ: 30000ms = 30 giây)
+  expiration-ms: 30000

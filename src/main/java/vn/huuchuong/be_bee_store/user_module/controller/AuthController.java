@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import vn.huuchuong.be_bee_store.base.BaseResponse;
 import vn.huuchuong.be_bee_store.user_module.payload.request.CreateUserRequest;
+import vn.huuchuong.be_bee_store.user_module.payload.request.RefreshTokenRequest;
 import vn.huuchuong.be_bee_store.user_module.payload.request.UserLoginResquest;
 import vn.huuchuong.be_bee_store.user_module.payload.response.AuthResponse;
 import vn.huuchuong.be_bee_store.user_module.payload.response.CreateUserResponse;
@@ -38,22 +39,22 @@ public class AuthController {
         BaseResponse<AuthResponse> response = authService.login(request, httpReq);
         return ResponseEntity.ok(response);
     }
-//
-//    @PostMapping("/refresh")
-//    public ResponseEntity<BaseResponse<AuthResponse>> refresh(
-//            @Valid @RequestBody RefreshTokenRequest request,
-//            HttpServletRequest httpReq) {
-//
-//        BaseResponse<AuthResponse> response = authService.refresh(request, httpReq);
-//        return ResponseEntity.ok(response);
-//    }
-//
-//    @PostMapping("/logout")
-//    public ResponseEntity<BaseResponse<String>> logout(Authentication authentication) {
-//        BaseResponse<String> response = authService.logout(authentication);
-//        return ResponseEntity.ok(response);
-//    }
-//
+
+    @PostMapping("/refresh")
+    public ResponseEntity<BaseResponse<AuthResponse>> refresh(
+            @Valid @RequestBody RefreshTokenRequest request,
+            HttpServletRequest httpReq) {
+
+        BaseResponse<AuthResponse> response = authService.refresh(request, httpReq);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<BaseResponse<String>> logout(Authentication authentication) {
+        BaseResponse<String> response = authService.logout(authentication);
+        return ResponseEntity.ok(response);
+    }
+
     @Transactional
     @PostMapping("/register")
     @Operation(
@@ -66,18 +67,18 @@ public class AuthController {
         BaseResponse<CreateUserResponse> response = authService.register(request);
         return ResponseEntity.status(201).body(response);
     }
-//
-//
-//
-//    @GetMapping(value = "/active/{accountId}", produces = MediaType.TEXT_HTML_VALUE)
-//    public ResponseEntity<String> activate(@PathVariable("accountId") UUID accountId) {
-//        String html = authService.activateAccount(accountId);
-//        return ResponseEntity.ok(html);
-//    }
-//
-//    @PostMapping("/resend-activation")
-//    public ResponseEntity<BaseResponse<String>> resendActivation(@RequestParam String email) {
-//        BaseResponse<String> response = authService.resendActivationEmail(email);
-//        return ResponseEntity.ok(response);
-//    }
+
+
+
+    @GetMapping(value = "/active/{accountId}", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> activate(@PathVariable("accountId") UUID accountId) {
+        String html = authService.activateAccount(accountId);
+        return ResponseEntity.ok(html);
+    }
+
+    @PostMapping("/resend-activation")
+    public ResponseEntity<BaseResponse<String>> resendActivation(@RequestParam String email) {
+        BaseResponse<String> response = authService.resendActivationEmail(email);
+        return ResponseEntity.ok(response);
+    }
 }
