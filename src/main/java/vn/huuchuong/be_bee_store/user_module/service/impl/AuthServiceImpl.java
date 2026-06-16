@@ -37,6 +37,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final IMailSenderService mailSenderService;
+    private final MailAsyncService mailAsyncService;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
     private final ModelMapper modelMapper;
@@ -77,6 +78,7 @@ public class AuthServiceImpl implements AuthService {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new BusinessException("Username already exists");
         }
+
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException("Email already exists");
         }
@@ -93,26 +95,15 @@ public class AuthServiceImpl implements AuthService {
 
         CreateUserResponse response = modelMapper.map(savedUser, CreateUserResponse.class);
 
-        // Tạo link kích hoạt
         String activationLink = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
                 .path("/api/v1/auth/active/{accountId}")
                 .buildAndExpand(savedUser.getId())
                 .toUriString();
 
-        // Gửi mail bằng hàm chuyên dụng
-        BaseResponse<String> mailResult =
-                mailSenderService.sendActivationEmail(savedUser.getEmail(), activationLink);
+        mailAsyncService.sendActivationEmailAsync(savedUser.getEmail(), activationLink);
 
-        String message;
-        if (mailResult.getData() == null) {
-            message = "Tạo tài khoản thành công nhưng gửi email kích hoạt thất bại: "
-                    + mailResult.getMessage();
-        } else {
-            message = "Tạo tài khoản thành công! Vui lòng kiểm tra email để kích hoạt.";
-        }
-
-
+        String message = "Tạo tài khoản thành công! Vui lòng kiểm tra email để kích hoạt.";
 
         return new BaseResponse<>(response, message);
     }
