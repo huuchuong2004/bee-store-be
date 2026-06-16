@@ -14,12 +14,12 @@ spring:
     hibernate:
       ddl-auto: update
 
-  # Đã đưa cấu hình mail ra đúng phân cấp thuộc nhánh 'spring'
+
   mail:
     host: smtp.gmail.com
     port: 587
     username: huuchuong398@gmail.com
-    password: "mmwg kywb bkqv cuew"
+    password: "kmwr gsmv uvwg esad"
     properties:
       mail:
         smtp:
