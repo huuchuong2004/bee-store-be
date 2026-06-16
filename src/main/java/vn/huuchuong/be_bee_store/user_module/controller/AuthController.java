@@ -41,6 +41,10 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @Operation(
+            summary = "Refresh Token",
+            description = "API này sẽ được gọi khi Access token hết hạn"
+    )
     public ResponseEntity<BaseResponse<AuthResponse>> refresh(
             @Valid @RequestBody RefreshTokenRequest request,
             HttpServletRequest httpReq) {
@@ -50,6 +54,10 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @Operation(
+            summary = "Logout",
+            description = "API này sẽ được gọi khi user cần đăng xuất, nó sẽ xóa token ra khỏi DB"
+    )
     public ResponseEntity<BaseResponse<String>> logout(Authentication authentication) {
         BaseResponse<String> response = authService.logout(authentication);
         return ResponseEntity.ok(response);
@@ -71,12 +79,20 @@ public class AuthController {
 
 
     @GetMapping(value = "/active/{accountId}", produces = MediaType.TEXT_HTML_VALUE)
+    @Operation(
+            summary = "Kích Hoạt    ",
+            description = "API Kích Hoạt Tài Khoản ( FE không gọi API Này"
+    )
     public ResponseEntity<String> activate(@PathVariable("accountId") UUID accountId) {
         String html = authService.activateAccount(accountId);
         return ResponseEntity.ok(html);
     }
 
     @PostMapping("/resend-activation")
+    @Operation(
+            summary = "Kích Hoạt Tài Khoản Lại Khi Người Dùng Chưa Nhận Được Mail, Người Dùng Sẽ Chủ Động Gọi function này    ",
+            description = "API Kích Hoạt Tài Khoản "
+    )
     public ResponseEntity<BaseResponse<String>> resendActivation(@RequestParam String email) {
         BaseResponse<String> response = authService.resendActivationEmail(email);
         return ResponseEntity.ok(response);
