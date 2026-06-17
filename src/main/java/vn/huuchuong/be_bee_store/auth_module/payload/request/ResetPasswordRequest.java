@@ -1,5 +1,6 @@
 package vn.huuchuong.be_bee_store.auth_module.payload.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,9 @@ public class ResetPasswordRequest {
     @NotBlank(message = "Xác nhận mật khẩu không được để trống")
     private String confirmPassword;
 
+
+    @JsonIgnore
+    @Schema(hidden = true)
     @AssertTrue(message = "Mật khẩu xác nhận không khớp")
     public boolean isPasswordMatching() {
         if (newPassword == null || confirmPassword == null) {
