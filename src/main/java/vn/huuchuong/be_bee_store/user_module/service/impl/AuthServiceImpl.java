@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import vn.huuchuong.be_bee_store.base.BaseResponse;
+import vn.huuchuong.be_bee_store.error.ErrorCode;
 import vn.huuchuong.be_bee_store.exception.BusinessException;
 import vn.huuchuong.be_bee_store.user_module.entity.RefreshToken;
 import vn.huuchuong.be_bee_store.user_module.entity.User;
@@ -28,6 +29,7 @@ import vn.huuchuong.be_bee_store.utils.JwtUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -52,6 +54,15 @@ public class AuthServiceImpl implements AuthService {
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) { // phat hein user va kiem tra mat khau
             return BaseResponse.error("Sai username hoặc password");
+        }
+        if (optUser.get().getIsActive() == null || !optUser.get().getIsActive()) {
+            return BaseResponse.error(
+                    ErrorCode.ACCOUNT_NOT_ACTIVATED,
+                    Map.of(
+                            "nextAction", "GO_TO_ACTIVATION_PAGE",
+                            "email", user.getEmail()
+                    )
+            );
         }
 
 
