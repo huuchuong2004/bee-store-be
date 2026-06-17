@@ -42,5 +42,9 @@ logging:
 
 jwt:
   secret-base64: "kRZtO5/vUdtnabWGyd/N0CUU7h7ID4OK/OkxXi+j3Qxf7SV40PASQovBDnTIGAe4nSuonLwClVnwP1ucioXhFw=="
-  # Đã xóa bỏ phần text thừa lỗi cú pháp, cấu hình thời gian hết hạn (ví dụ: 30000ms = 30 giây)
+
   expiration-ms: 30000
+
+app:
+  frontend:
+    reset-password-url: http://localhost:3000/reset-password

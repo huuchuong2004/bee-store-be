@@ -3,9 +3,7 @@ package vn.huuchuong.be_bee_store.base;
 
 
 import lombok.*;
-import vn.huuchuong.be_bee_store.error.ErrorCode;
-
-import java.util.Map;
+import vn.huuchuong.be_bee_store.auth_module.error.ErrorCode;
 
 @Getter
 @Setter

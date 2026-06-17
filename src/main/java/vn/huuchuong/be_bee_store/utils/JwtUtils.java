@@ -3,13 +3,12 @@ package vn.huuchuong.be_bee_store.utils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import vn.huuchuong.be_bee_store.user_module.payload.response.UserLoginResponse;
+import vn.huuchuong.be_bee_store.auth_module.payload.response.UserLoginResponse;
 import javax.crypto.SecretKey;
 import java.util.*;
 public class JwtUtils {
