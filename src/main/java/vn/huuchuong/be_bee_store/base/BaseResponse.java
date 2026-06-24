@@ -55,6 +55,14 @@ public class BaseResponse<T> {
                 .build();
     }
 
+    public static <T> BaseResponse<T> success( String message) {
+        return BaseResponse.<T>builder()
+                .success(true)
+                .message(message)
+
+                .build();
+    }
+
 
     public static <T> BaseResponse<T> error(String message) {
         return BaseResponse.<T>builder()
