@@ -57,6 +57,10 @@ public class PaymentServiceImpl implements PaymentService {
         if (order.getStatus() != OrderStatus.CREATED) {
             throw new BusinessException("Trạng thái đơn hàng không hợp lệ để tạo thanh toán COD");
         }
+        List<Payment> oldPayments = paymentRepository.findByOrder(order);
+        if (oldPayments != null && !oldPayments.isEmpty()) {
+            throw new BusinessException("Đơn hàng này đã có thông tin thanh toán");
+        }
 
         PaymentMethod codMethod = paymentMethodRepository.findByCode(PaymentMethodType.COD)
                 .orElseThrow(() -> new BusinessException("Chưa cấu hình phương thức COD"));

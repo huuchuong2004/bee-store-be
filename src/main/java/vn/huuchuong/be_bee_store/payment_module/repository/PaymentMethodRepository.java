@@ -6,7 +6,11 @@ import vn.huuchuong.be_bee_store.payment_module.entity.PaymentMethod;
 
 import java.util.Optional;
 
+
+
 public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, Integer> {
 
     Optional<PaymentMethod> findByCode(PaymentMethodType code);
+
+    boolean existsByCode(PaymentMethodType code);
 }
