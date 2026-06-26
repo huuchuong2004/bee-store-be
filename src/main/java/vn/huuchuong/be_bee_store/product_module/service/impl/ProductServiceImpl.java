@@ -504,6 +504,26 @@ public class ProductServiceImpl implements ProductService {
         return sku;
     }
 
+    // ======================== ADMIN: GET ALL INCLUDING DELETED ============================
+
+    @Override
+    @Transactional
+    public Page<ProductListResponse> findAllForAdmin(Pageable pageable) {
+        Page<Product> page = productRepository.findAllBy(pageable);
+        return page.map(productMapper::toProductListResponse);
+    }
+
+// ======================== ADMIN: GET DETAIL INCLUDING DELETED ============================
+
+    @Override
+    @Transactional
+    public ProductResponse getProductDetailForAdmin(Integer productId) {
+        Product product = productRepository.findByProductId(productId)
+                .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại"));
+
+        return productMapper.toProductResponse(product);
+    }
+
     private String normalize(String s) {
         if (s == null) return "";
         return s.trim().replaceAll("\\s+", "-").toUpperCase();

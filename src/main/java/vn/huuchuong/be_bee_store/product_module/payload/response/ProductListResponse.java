@@ -3,6 +3,7 @@ package vn.huuchuong.be_bee_store.product_module.payload.response;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 @Data
 public class ProductListResponse {
@@ -16,4 +17,6 @@ public class ProductListResponse {
     private String categoryName;
 
     private List<String> imageUrls;
+    private boolean deleted;
+    private LocalDateTime deletedAt;
 }

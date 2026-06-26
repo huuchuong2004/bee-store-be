@@ -220,4 +220,43 @@ public class ProductController {
                 new BaseResponse<>(productService.getProductByCategpgys(id, pageable), "Lấy danh sách thành công")
         );
     }
+
+    @Operation(
+            summary = "Admin lấy tất cả sản phẩm",
+            description = """
+                API dành cho quản trị viên để lấy tất cả sản phẩm trong hệ thống,
+                bao gồm cả sản phẩm đang hoạt động và sản phẩm đã bị xóa mềm.
+                """
+    )
+    @GetMapping("/admin")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<BaseResponse<Page<ProductListResponse>>> getAllProductForAdmin(
+            @PageableDefault(page = 0, size = 10, sort = "productId", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+
+        Page<ProductListResponse> result = productService.findAllForAdmin(pageable);
+        return ResponseEntity.ok(
+                BaseResponse.success(result, "Admin lấy danh sách sản phẩm thành công")
+        );
+    }
+
+    @Operation(
+            summary = "Admin lấy chi tiết sản phẩm",
+            description = """
+                API dành cho quản trị viên để lấy chi tiết sản phẩm theo productId,
+                bao gồm cả sản phẩm đã bị xóa mềm.
+                """
+    )
+    @GetMapping("/admin/{productId}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<BaseResponse<ProductResponse>> getDetailForAdmin(
+            @PathVariable Integer productId) {
+
+        return ResponseEntity.ok(
+                BaseResponse.success(
+                        productService.getProductDetailForAdmin(productId),
+                        "Admin lấy chi tiết sản phẩm thành công"
+                )
+        );
+    }
 }

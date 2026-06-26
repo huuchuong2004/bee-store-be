@@ -15,5 +15,10 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, JpaS
 
     Page<Product> findByDeletedFalse(Pageable pageable);
 
+    Page<Product> findByDeletedTrue(Pageable pageable);
+
+    Page<Product> findAllBy(Pageable pageable);
+
+    Optional<Product> findByProductId(Integer productId);
     Page<Product> findByCategory_IdInAndDeletedFalse(List<Integer> categoryIds, Pageable pageable);
 }

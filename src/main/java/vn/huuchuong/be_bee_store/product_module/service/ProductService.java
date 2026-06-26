@@ -35,4 +35,8 @@ public interface ProductService {
     void deleteImageByUrl(Integer productId, String imageUrl);
 
     ProductResponse restoreProduct(Integer productId);
+
+    Page<ProductListResponse> findAllForAdmin(Pageable pageable);
+
+    ProductResponse getProductDetailForAdmin(Integer productId);
 }
