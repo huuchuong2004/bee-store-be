@@ -22,6 +22,9 @@ public class CategoryServiceImpl implements CategoryService {
     public Page<Category> findAll(Pageable pageable) {
         Page<Category> categories = null;
         categories=categoryRepository.findAll(pageable);
+        if (categories==null){
+            throw new BusinessException("Không tìm thấy danh mục nào");
+        }
         return categories;
     }
 
@@ -58,7 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Boolean delete(Integer id) {
         // 1. Tìm category, nếu không có thì báo lỗi rõ ràng
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Category not found with id = " + id));
+                .orElseThrow(() -> new BusinessException("Category không có trong hệ thống = " + id));
 
         // 2. Không cho xoá nếu vẫn còn category con
         if (category.getChildren() != null && !category.getChildren().isEmpty()) {
