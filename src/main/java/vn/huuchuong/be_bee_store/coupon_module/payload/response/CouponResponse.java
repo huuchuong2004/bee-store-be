@@ -19,4 +19,5 @@ public class CouponResponse {
     private Integer maxUsage;
     private Integer maxUsagePerUser;
     private Integer currentUsage;
+    private Boolean deleted ;
 }

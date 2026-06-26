@@ -11,6 +11,7 @@ import lombok.Setter;
 import vn.huuchuong.be_bee_store.category_module.entity.Category;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -43,4 +44,8 @@ public class Product {
     // cu co list thì them cade vs orphan
     @JsonIgnore
     private List<ProductImage> images;
+    @Column(nullable = false)
+    private Boolean deleted = false;
+
+    private LocalDateTime deletedAt;
 }

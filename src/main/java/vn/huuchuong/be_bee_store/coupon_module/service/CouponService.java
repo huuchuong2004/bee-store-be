@@ -12,4 +12,6 @@ public interface CouponService {
 
 
     Boolean deleteCoupon(Integer id);
+
+    Page<CouponResponse> getCouponsForAdmin(Pageable pageable);
 }

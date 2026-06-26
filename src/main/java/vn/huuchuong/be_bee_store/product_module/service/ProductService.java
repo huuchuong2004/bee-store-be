@@ -33,4 +33,6 @@ public interface ProductService {
     Page<ProductListResponse> getProductByCategpgys(Integer categoryId, Pageable pageable);
 
     void deleteImageByUrl(Integer productId, String imageUrl);
+
+    ProductResponse restoreProduct(Integer productId);
 }

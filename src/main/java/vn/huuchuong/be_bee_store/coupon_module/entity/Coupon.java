@@ -1,12 +1,10 @@
 package vn.huuchuong.be_bee_store.coupon_module.entity;
 
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import vn.huuchuong.be_bee_store.base.BaseEntity;
-
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -24,6 +22,8 @@ import java.util.List;
                 @UniqueConstraint(name = "uq_coupon_code", columnNames = "coupon_code")
         }
 )
+@SQLDelete(sql = "UPDATE coupon SET deleted = true WHERE coupon_id = ?")
+@Where(clause = "deleted = false")
 public class Coupon extends BaseEntity {
 
     @Id
@@ -37,8 +37,6 @@ public class Coupon extends BaseEntity {
     private BigDecimal discountValue;
 
     private LocalDate startDate;
-
-
 
     private LocalDate endDate;
 
@@ -54,8 +52,9 @@ public class Coupon extends BaseEntity {
     @Column(nullable = false)
     private Integer currentUsage;
 
+    @Column(nullable = false)
+    private Boolean deleted = false;
+
     @OneToMany(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
-
     private List<CouponUsage> couponUsages;
-
 }

@@ -43,4 +43,10 @@ public class ProductSpectification {
             return criteriaBuilder.lessThanOrEqualTo(root.get("baseprice"), maxPrice);
         };
     }
+    public static Specification<Product> notDeleted() {
+        return (root, query, cb) -> cb.or(
+                cb.isFalse(root.get("deleted")),
+                cb.isNull(root.get("deleted"))
+        );
+    }
 }

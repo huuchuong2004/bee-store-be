@@ -26,6 +26,7 @@ import vn.huuchuong.be_bee_store.product_module.spec.ProductSpectification;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,12 +39,16 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
-
-
     private final IProductVariantRepository productVariantRepository;
     private final ProductImageRepository productImageRepository;
-
     private final InventoryRepository inventoryRepository;
+
+    // ======================== HELPER ============================
+
+    private Product getActiveProduct(Integer productId) {
+        return productRepository.findByProductIdAndDeletedFalse(productId)
+                .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại hoặc đã bị xóa"));
+    }
 
     // ======================== CREATE PRODUCT ============================
 
@@ -59,6 +64,8 @@ public class ProductServiceImpl implements ProductService {
         product.setName(req.getName());
         product.setDescription(req.getDescription());
         product.setBaseprice(req.getBaseprice());
+        product.setDeleted(false);
+        product.setDeletedAt(null);
 
         product.setVariants(new ArrayList<>());
         product.setImages(new ArrayList<>());
@@ -97,7 +104,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product saved = productRepository.save(product);
 
-        // 🔥 Tạo inventory cho từng variant
+        // Tạo inventory cho từng variant
         for (ProductVariant v : saved.getVariants()) {
             Inventory inv = new Inventory();
             inv.setProductVariant(v);
@@ -114,7 +121,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public Page<ProductListResponse> findAll(Pageable pageable) {
-        Page<Product> page = productRepository.findAll(pageable);
+        Page<Product> page = productRepository.findByDeletedFalse(pageable);
         return page.map(productMapper::toProductListResponse);
     }
 
@@ -123,8 +130,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductResponse getProductDetail(Integer productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại"));
+        Product product = getActiveProduct(productId);
         return productMapper.toProductResponse(product);
     }
 
@@ -134,8 +140,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductResponse updateProduct(Integer id, UpdateProductRequest req) {
 
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại"));
+        Product product = getActiveProduct(id);
 
         // category
         if (req.getCategoryId() != null && req.getCategoryId() > 0) {
@@ -170,14 +175,13 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.toProductResponse(saved);
     }
 
-    // ======================== DELETE PRODUCT ============================
+    // ======================== SOFT DELETE PRODUCT ============================
 
     @Override
     @Transactional
     public void deleteProduct(Integer productId) {
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại"));
+        Product product = getActiveProduct(productId);
 
         List<ProductVariant> variants = product.getVariants();
 
@@ -187,21 +191,38 @@ public class ProductServiceImpl implements ProductService {
                 Inventory inv = inventoryRepository.findByProductVariant(variant)
                         .orElse(null);
 
-                if (inv != null && inv.getCurrentStockLevel() > 0) {
+                if (inv != null && inv.getCurrentStockLevel() != null && inv.getCurrentStockLevel() > 0) {
                     throw new BusinessException(
                             "Không thể xóa sản phẩm vì biến thể " + variant.getSku()
                                     + " còn tồn kho: " + inv.getCurrentStockLevel()
                     );
                 }
             }
-
-            for (ProductVariant variant : variants) {
-                Inventory inv = inventoryRepository.findByProductVariant(variant).orElse(null);
-                if (inv != null) inventoryRepository.delete(inv);
-            }
         }
 
-        productRepository.delete(product);
+        product.setDeleted(true);
+        product.setDeletedAt(LocalDateTime.now());
+
+        productRepository.save(product);
+    }
+
+    // ======================== RESTORE PRODUCT ============================
+
+    @Override
+    @Transactional
+    public ProductResponse restoreProduct(Integer productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại"));
+
+        if (Boolean.FALSE.equals(product.getDeleted())) {
+            throw new BusinessException("Sản phẩm chưa bị xóa");
+        }
+
+        product.setDeleted(false);
+        product.setDeletedAt(null);
+
+        Product saved = productRepository.save(product);
+        return productMapper.toProductResponse(saved);
     }
 
     // ======================== VARIANT: CREATE ============================
@@ -210,8 +231,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductResponse createpv(Integer productId, CreateProductVariantRequest req) {
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại"));
+        Product product = getActiveProduct(productId);
 
         if (product.getVariants() == null) {
             product.setVariants(new ArrayList<>());
@@ -225,7 +245,7 @@ public class ProductServiceImpl implements ProductService {
             throw new BusinessException("Biến thể này đã tồn tại");
         }
 
-        // 1. Tạo variant mới
+        // Tạo variant mới
         ProductVariant variant = new ProductVariant();
         variant.setProduct(product);
         variant.setSize(req.getSize());
@@ -239,12 +259,8 @@ public class ProductServiceImpl implements ProductService {
         }
         variant.setSku(sku);
 
-
         ProductVariant savedVariant = productVariantRepository.save(variant);
-
-
         product.getVariants().add(savedVariant);
-
 
         Inventory inventory = new Inventory();
         inventory.setProductVariant(savedVariant);
@@ -252,17 +268,11 @@ public class ProductServiceImpl implements ProductService {
         inventory.setLastUpdate(LocalDate.now());
 
         inventoryRepository.save(inventory);
-
-
         productRepository.save(product);
 
-
-        Product productLatest = productRepository.findById(productId)
-                .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại"));
-
+        Product productLatest = getActiveProduct(productId);
         return productMapper.toProductResponse(productLatest);
     }
-
 
     // ======================== VARIANT: UPDATE ============================
 
@@ -270,8 +280,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductResponse updateVariant(Integer productId, Integer variantId, UpdateProductVariantRequest req) {
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại"));
+        Product product = getActiveProduct(productId);
 
         ProductVariant variant = productVariantRepository.findById(variantId)
                 .orElseThrow(() -> new BusinessException("Biến thể không tồn tại"));
@@ -303,7 +312,6 @@ public class ProductServiceImpl implements ProductService {
         if (req.getColor() != null) variant.setColor(newColor);
         if (req.getPrice() != null) variant.setPrice(req.getPrice());
 
-
         if (req.getQuantityInStock() != null) {
             if (req.getQuantityInStock() < 0) {
                 throw new BusinessException("Tồn kho không được âm");
@@ -321,7 +329,8 @@ public class ProductServiceImpl implements ProductService {
 
         productVariantRepository.save(variant);
 
-        return productMapper.toProductResponse(product);
+        Product latestProduct = getActiveProduct(productId);
+        return productMapper.toProductResponse(latestProduct);
     }
 
     // ======================== VARIANT: DELETE ============================
@@ -330,8 +339,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void deleteVariant(Integer productId, Integer variantId) {
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại"));
+        Product product = getActiveProduct(productId);
 
         ProductVariant variant = productVariantRepository.findById(variantId)
                 .orElseThrow(() -> new BusinessException("Biến thể không tồn tại"));
@@ -340,10 +348,8 @@ public class ProductServiceImpl implements ProductService {
             throw new BusinessException("Biến thể không thuộc về sản phẩm này");
         }
 
-
         Inventory inventory = inventoryRepository.findByProductVariant(variant)
                 .orElse(null);
-
 
         if (inventory != null && inventory.getCurrentStockLevel() != null
                 && inventory.getCurrentStockLevel() > 0) {
@@ -356,18 +362,20 @@ public class ProductServiceImpl implements ProductService {
             inventoryRepository.delete(inventory);
         }
 
+        if (product.getVariants() != null) {
+            product.getVariants().removeIf(v -> v.getProductVariantId().equals(variantId));
+        }
 
         productVariantRepository.delete(variant);
     }
 
-
+    // ======================== IMAGES: CREATE ============================
 
     @Override
     @Transactional
     public ProductResponse addImages(Integer productId, AddProductImagesRequest req) {
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại"));
+        Product product = getActiveProduct(productId);
 
         if (req.getImageUrls() == null || req.getImageUrls().isEmpty()) {
             throw new BusinessException("Danh sách imageUrls không được rỗng");
@@ -389,14 +397,13 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.toProductResponse(saved);
     }
 
-    // ======================== IMAGES: DELETE ============================
+    // ======================== IMAGES: DELETE BY ID ============================
 
     @Override
     @Transactional
     public void deleteImage(Integer productId, Integer imageId) {
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại"));
+        Product product = getActiveProduct(productId);
 
         ProductImage image = productImageRepository.findById(imageId)
                 .orElseThrow(() -> new BusinessException("Ảnh không tồn tại"));
@@ -412,9 +419,38 @@ public class ProductServiceImpl implements ProductService {
         productImageRepository.delete(image);
     }
 
+    // ======================== IMAGES: DELETE BY URL ============================
+
+    @Override
+    @Transactional
+    public void deleteImageByUrl(Integer productId, String imageUrl) {
+
+        Product product = getActiveProduct(productId);
+
+        ProductImage imageToDelete = null;
+
+        if (product.getImages() != null) {
+            for (ProductImage img : product.getImages()) {
+                if (img.getImageURL() != null && img.getImageURL().equals(imageUrl)) {
+                    imageToDelete = img;
+                    break;
+                }
+            }
+        }
+
+        if (imageToDelete == null) {
+            throw new BusinessException("Ảnh không tồn tại hoặc không thuộc về sản phẩm này");
+        }
+
+        product.getImages().remove(imageToDelete);
+        productImageRepository.delete(imageToDelete);
+    }
+
+    // ======================== SEARCH ============================
+
     @Override
     public Page<ProductListResponse> search(ProductFilter req, Pageable pageable) {
-        Specification<Product> spec = Specification.allOf();
+        Specification<Product> spec = ProductSpectification.notDeleted();
 
         if (req.getName() != null && !req.getName().isBlank()) {
             spec = spec.and(ProductSpectification.hasName(req.getName()));
@@ -437,45 +473,16 @@ public class ProductServiceImpl implements ProductService {
         return page.map(productMapper::toProductListResponse);
     }
 
+    // ======================== GET BY CATEGORY ============================
+
     @Override
     public Page<ProductListResponse> getProductByCategpgys(Integer categoryId, Pageable pageable) {
-        Category root = categoryRepository.findById(categoryId).orElseThrow(() -> new BusinessException("Danh Muc Khong Co !"));
+        Category root = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new BusinessException("Danh mục không tồn tại"));
 
         List<Integer> list = getAllCategoryIdsIteractive(root);
-        Page<Product> find = productRepository.findByCategory_IdIn(list, pageable);
+        Page<Product> find = productRepository.findByCategory_IdInAndDeletedFalse(list, pageable);
         return find.map(productMapper::toProductListResponse);
-
-    }
-
-    @Override
-    @Transactional
-    public void deleteImageByUrl(Integer productId, String imageUrl) {
-        // 1. Kiểm tra sản phẩm tồn tại
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại"));
-
-        // 2. Tìm ảnh có URL tương ứng trong danh sách ảnh của sản phẩm
-        ProductImage imageToDelete = null;
-
-        if (product.getImages() != null) {
-            for (ProductImage img : product.getImages()) {
-                // So sánh URL (lưu ý: imageUrl gửi lên có thể cần decode nếu bị encode)
-                if (img.getImageURL() != null && img.getImageURL().equals(imageUrl)) {
-                    imageToDelete = img;
-                    break;
-                }
-            }
-        }
-
-        if (imageToDelete == null) {
-            throw new BusinessException("Ảnh không tồn tại hoặc không thuộc về sản phẩm này");
-        }
-
-        // 3. Xóa khỏi danh sách của Product (để Hibernate cập nhật quan hệ)
-        product.getImages().remove(imageToDelete);
-
-        // 4. Xóa khỏi Database
-        productImageRepository.delete(imageToDelete);
     }
 
     // ======================== SKU HELPER ============================
@@ -503,15 +510,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private List<Integer> getAllCategoryIdsIteractive(Category root) {
-        List<Integer> categoryIds = new ArrayList<>(); // tao lisst luu id
-        Queue<Category> categoryQueue = new LinkedList<>(); // tao 1 hang doi luu catggory
+        List<Integer> categoryIds = new ArrayList<>();
+        Queue<Category> categoryQueue = new LinkedList<>();
 
-        categoryQueue.add(root); // bo root vao dau tien  // luc nao trong quue se co ao
-        while (!categoryQueue.isEmpty()) { // catgory co ao ti tuc
-            Category category = categoryQueue.poll(); // lay phan tu ban dau ra va xoa no ngay lap tu ckhoi queue
+        categoryQueue.add(root);
+        while (!categoryQueue.isEmpty()) {
+            Category category = categoryQueue.poll();
             categoryIds.add(category.getId());
-            if (category.getChildren() != null && !category.getChildren().isEmpty()) { // neu no co con thi bo con no vao queue,
-                // vi du duuyet ao thi ao co con la ao thun thi bi ao thun vao,, duyet tiep ao thun cho toi khi orng hti se co dc list id
+            if (category.getChildren() != null && !category.getChildren().isEmpty()) {
                 categoryQueue.addAll(category.getChildren());
             }
         }

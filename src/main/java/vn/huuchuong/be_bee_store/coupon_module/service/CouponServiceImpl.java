@@ -31,8 +31,8 @@ public class CouponServiceImpl  implements CouponService {
     @Override
     public CouponResponse createCoupon(CreateCouponRequest request) {
 
-        if (couponRepository.findByCouponCode(request.getCouponCode()).isPresent()) {
-            throw new BusinessException("Đã Tồn tại mã giảm giá");
+        if (couponRepository.existsByCouponCodeAndDeletedFalse(request.getCouponCode())) {
+            throw new BusinessException("Đã tồn tại mã giảm giá");
         }
 
         Coupon coupon = new Coupon();
@@ -44,9 +44,10 @@ public class CouponServiceImpl  implements CouponService {
         coupon.setMaxUsage(request.getMaxUsage());
         coupon.setMaxUsagePerUser(request.getMaxUsagePerUser());
         coupon.setCurrentUsage(0);
+        coupon.setDeleted(false);
+
         Coupon savedCoupon = couponRepository.save(coupon);
         return toResponse(savedCoupon);
-
     }
 
     @Override
@@ -79,6 +80,12 @@ public class CouponServiceImpl  implements CouponService {
                 .maxUsage(c.getMaxUsage())
                 .maxUsagePerUser(c.getMaxUsagePerUser())
                 .currentUsage(c.getCurrentUsage())
+                .deleted(c.getDeleted())
                 .build();
+    }
+    @Override
+    public Page<CouponResponse> getCouponsForAdmin(Pageable pageable) {
+        return couponRepository.findAllForAdmin(pageable)
+                .map(this::toResponse);
     }
 }

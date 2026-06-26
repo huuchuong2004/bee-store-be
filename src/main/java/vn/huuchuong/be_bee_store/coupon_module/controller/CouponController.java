@@ -103,4 +103,22 @@ public class CouponController {
                 "Xoá coupon thành công"
         );
     }
+    @Operation(
+            summary = "Admin lấy tất cả coupon",
+            description = """
+                API dành cho admin lấy tất cả coupon trong hệ thống, bao gồm cả coupon đã bị xóa mềm.
+                """
+    )
+    @GetMapping("/admin")
+    public BaseResponse<Page<CouponResponse>> getCouponsForAdmin(
+            @Parameter(
+                    description = "Thông tin phân trang và sắp xếp. Ví dụ: page=0&size=10&sort=couponId,desc"
+            )
+            Pageable pageable
+    ) {
+        return BaseResponse.success(
+                couponService.getCouponsForAdmin(pageable),
+                "Admin lấy danh sách coupon thành công"
+        );
+    }
 }
