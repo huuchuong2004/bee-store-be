@@ -30,13 +30,13 @@ public class CORSConfig {
                         ,"http://localhost:5174"
                 ));
                 // nhớ thêm OPTIONS để preflight không lỗi
-                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
                 config.setAllowedHeaders(List.of("*"));
                 config.setAllowCredentials(true);// co dong nay thi moi request se gui kem cookie , token....
                 return config;
             };
 
-            // gắn source vào CorsConfigurer
+
             c.configurationSource(source);
         };
     }
