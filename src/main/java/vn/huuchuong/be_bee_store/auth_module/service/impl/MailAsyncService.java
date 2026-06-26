@@ -5,14 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import vn.huuchuong.be_bee_store.base.BaseResponse;
-import vn.huuchuong.be_bee_store.auth_module.service.IMailSenderService;
+import vn.huuchuong.be_bee_store.auth_module.service.MailSenderService;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MailAsyncService {
 
-    private final IMailSenderService mailSenderService;
+    private final MailSenderService mailSenderService;
 
     @Async("mailTaskExecutor")
     public void sendActivationEmailAsync(String email, String activationLink) {

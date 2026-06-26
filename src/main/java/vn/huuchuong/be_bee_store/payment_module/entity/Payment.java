@@ -38,5 +38,8 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, nullable = false)
     private PaymentStatus status;
+    @Column(name = "payment_date")
+    private LocalDateTime paymentDate;
+
 
 }

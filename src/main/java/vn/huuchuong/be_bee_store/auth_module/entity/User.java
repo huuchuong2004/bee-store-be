@@ -1,6 +1,7 @@
 package vn.huuchuong.be_bee_store.auth_module.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -8,6 +9,7 @@ import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import vn.huuchuong.be_bee_store.base.BaseEntity;
+import vn.huuchuong.be_bee_store.cart_module.entity.Cart;
 
 import java.util.UUID;
 
@@ -68,6 +70,11 @@ public class User extends BaseEntity {
     @Column(nullable = false, length = 10)
     @Builder.Default
     private Role role = Role.USER;
+
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Cart cart;
 
 
 }

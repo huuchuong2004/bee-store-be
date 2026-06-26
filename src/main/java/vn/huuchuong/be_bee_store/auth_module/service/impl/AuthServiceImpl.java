@@ -24,13 +24,11 @@ import vn.huuchuong.be_bee_store.auth_module.payload.response.CreateUserResponse
 import vn.huuchuong.be_bee_store.auth_module.payload.response.UserLoginResponse;
 import vn.huuchuong.be_bee_store.auth_module.repository.UserRepository;
 import vn.huuchuong.be_bee_store.auth_module.service.AuthService;
-import vn.huuchuong.be_bee_store.auth_module.service.IMailSenderService;
+import vn.huuchuong.be_bee_store.auth_module.service.MailSenderService;
 import vn.huuchuong.be_bee_store.utils.JwtUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 import vn.huuchuong.be_bee_store.auth_module.entity.PasswordResetToken;
-import vn.huuchuong.be_bee_store.auth_module.repository.PasswordResetTokenRepository;
 
 import java.security.SecureRandom;
 import java.time.Instant;
@@ -48,7 +46,7 @@ import java.util.UUID;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
-    private final IMailSenderService mailSenderService;
+    private final MailSenderService mailSenderService;
     private final MailAsyncService mailAsyncService;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
