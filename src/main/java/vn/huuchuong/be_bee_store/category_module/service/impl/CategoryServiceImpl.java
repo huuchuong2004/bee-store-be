@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.huuchuong.be_bee_store.category_module.entity.Category;
 import vn.huuchuong.be_bee_store.category_module.payload.request.CreateCategoryRequest;
 import vn.huuchuong.be_bee_store.category_module.payload.request.UpdateCategoryRequest;
+import vn.huuchuong.be_bee_store.category_module.payload.resposne.CategoryResponse;
 import vn.huuchuong.be_bee_store.category_module.repository.CategoryRepository;
 import vn.huuchuong.be_bee_store.category_module.service.CategoryService;
 import vn.huuchuong.be_bee_store.exception.BusinessException;
@@ -23,32 +24,38 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public Page<Category> findAll(Pageable pageable) {
+    public Page<CategoryResponse> findAll(Pageable pageable) {
         Page<Category> categories = categoryRepository.findAllByIsActiveTrue(pageable);
 
         if (categories.isEmpty()) {
             throw new BusinessException("Không tìm thấy danh mục nào");
         }
 
-        return categories;
+        return categories.map(this::toResponse);
     }
 
     @Override
-    public List<Category> findByParent(int id) {
+    public List<CategoryResponse> findByParent(int id) {
         Category parent = categoryRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new BusinessException("Không tìm thấy danh mục cha = " + id));
 
-        return categoryRepository.findAllByParentIdAndIsActiveTrue(parent.getId());
+        return categoryRepository.findAllByParentIdAndIsActiveTrue(parent.getId())
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     @Override
-    public List<Category> findRoots() {
-        return categoryRepository.findAllByParentIsNullAndIsActiveTrue();
+    public List<CategoryResponse> findRoots() {
+        return categoryRepository.findAllByParentIsNullAndIsActiveTrue()
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     @Override
     @Transactional
-    public Category create(CreateCategoryRequest request) {
+    public CategoryResponse create(CreateCategoryRequest request) {
         if (categoryRepository.existsByNameAndIsActiveTrue(request.getName())) {
             throw new BusinessException("Tên danh mục đã tồn tại");
         }
@@ -65,7 +72,7 @@ public class CategoryServiceImpl implements CategoryService {
             parent.addChild(cate);
         }
 
-        return categoryRepository.save(cate);
+        return toResponse(categoryRepository.save(cate));
     }
 
     @Override
@@ -74,30 +81,29 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new BusinessException("Category không có trong hệ thống = " + id));
 
-        if (categoryRepository.existsByParentIdAndIsActiveTrue(id)) {
-            throw new BusinessException("Không thể xóa danh mục vì đang có danh mục con hoạt động");
-        }
+        softDeleteRecursive(category);
 
-        category.setIsActive(false);
         categoryRepository.save(category);
 
         return true;
     }
 
     @Override
-    public List<Category> findAllForAdmin() {
+    public List<CategoryResponse> findAllForAdmin() {
         List<Category> categories = categoryRepository.findAll();
 
         if (categories.isEmpty()) {
             throw new BusinessException("Không tìm thấy danh mục nào");
         }
 
-        return categories;
+        return categories.stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     @Override
     @Transactional
-    public Category update(Integer id, UpdateCategoryRequest request) {
+    public CategoryResponse update(Integer id, UpdateCategoryRequest request) {
         Category category = categoryRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new BusinessException("Không tìm thấy danh mục = " + id));
 
@@ -130,7 +136,7 @@ public class CategoryServiceImpl implements CategoryService {
             category.setIsActive(request.getIsActive());
         }
 
-        return categoryRepository.save(category);
+        return toResponse(categoryRepository.save(category));
     }
 
     @Override
@@ -146,17 +152,21 @@ public class CategoryServiceImpl implements CategoryService {
         restoreRecursive(category);
 
         categoryRepository.save(category);
+
         return true;
     }
 
-    private void restoreRecursive(Category category) {
-        category.setIsActive(true);
-
-        if (category.getChildren() != null) {
-            for (Category child : category.getChildren()) {
-                restoreRecursive(child);
-            }
-        }
+    private CategoryResponse toResponse(Category category) {
+        return CategoryResponse.builder()
+                .createdAt(category.getCreatedAt())
+                .updatedAt(category.getUpdatedAt())
+                .id(category.getId())
+                .name(category.getName())
+                .description(category.getDescription())
+                .isActive(category.getIsActive())
+                .parentId(category.getParent() != null ? category.getParent().getId() : null)
+                .parentName(category.getParent() != null ? category.getParent().getName() : null)
+                .build();
     }
 
     private void softDeleteRecursive(Category category) {
@@ -170,4 +180,15 @@ public class CategoryServiceImpl implements CategoryService {
             }
         }
     }
+    private void restoreRecursive(Category category) {
+        category.setIsActive(true);
+
+        if (category.getChildren() != null) {
+            for (Category child : category.getChildren()) {
+                restoreRecursive(child);
+            }
+        }
+    }
+
+
 }

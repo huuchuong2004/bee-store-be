@@ -5,23 +5,24 @@ import org.springframework.data.domain.Pageable;
 import vn.huuchuong.be_bee_store.category_module.entity.Category;
 import vn.huuchuong.be_bee_store.category_module.payload.request.CreateCategoryRequest;
 import vn.huuchuong.be_bee_store.category_module.payload.request.UpdateCategoryRequest;
+import vn.huuchuong.be_bee_store.category_module.payload.resposne.CategoryResponse;
 
 import java.util.List;
 
 public interface CategoryService {
-    Page<Category> findAll(Pageable pageable);
+    Page<CategoryResponse> findAll(Pageable pageable);
 
-    List<Category> findByParent(int id);
+    List<CategoryResponse> findByParent(int id);
 
-    List<Category> findRoots();
+    List<CategoryResponse> findRoots();
 
-    Category create(CreateCategoryRequest category);
+    CategoryResponse create(CreateCategoryRequest request);
 
     Boolean delete(Integer id);
 
-    List<Category> findAllForAdmin();
+    List<CategoryResponse> findAllForAdmin();
 
-    Category update(Integer id, UpdateCategoryRequest request);
+    CategoryResponse update(Integer id, UpdateCategoryRequest request);
 
     Boolean restore(Integer id);
 }

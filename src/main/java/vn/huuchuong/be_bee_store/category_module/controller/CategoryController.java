@@ -13,6 +13,7 @@ import vn.huuchuong.be_bee_store.base.BaseResponse;
 import vn.huuchuong.be_bee_store.category_module.entity.Category;
 import vn.huuchuong.be_bee_store.category_module.payload.request.CreateCategoryRequest;
 import vn.huuchuong.be_bee_store.category_module.payload.request.UpdateCategoryRequest;
+import vn.huuchuong.be_bee_store.category_module.payload.resposne.CategoryResponse;
 import vn.huuchuong.be_bee_store.category_module.service.CategoryService;
 
 import java.util.List;
@@ -29,19 +30,19 @@ public class CategoryController {
 
     @GetMapping
     @Operation(summary = "Lấy Tất Cả Danh Mục", description = "API lấy ra tất cả các danh mục , kể cả danh mục con")
-    public ResponseEntity<BaseResponse<Page<Category>>> getAllCategory(Pageable pageable) {
+    public ResponseEntity<BaseResponse<Page<CategoryResponse>>> getAllCategory(Pageable pageable) {
         return ResponseEntity.ok(new BaseResponse<>(categoryService.findAll(pageable), "Lấy Danh Sách Thành Công"));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Lấy Cây Danh Mục", description = "API Lấy Cây Danh Mục Theo ID Cha")
-    public ResponseEntity<BaseResponse<List<Category>>> getCategoryById(@PathVariable int id) { // Lấy Cây Category
+    public ResponseEntity<BaseResponse<List<CategoryResponse>>> getCategoryById(@PathVariable int id) { // Lấy Cây Category
         return ResponseEntity.ok(new BaseResponse<>(categoryService.findByParent(id), null));
     }
 
     @GetMapping("/root")
     @Operation(summary = "Lấy Tất Cả Danh Mục Gốc )", description = "API : Lấy Tất Cả Danh Mục Gốc (Không phụ thuộc vào Danh Mục nào)")
-    public ResponseEntity<BaseResponse<List<Category>>> getCategoryRoot() { // Lấy Các Category Gốc
+    public ResponseEntity<BaseResponse<List<CategoryResponse>>> getCategoryRoot() { // Lấy Các Category Gốc
         return ResponseEntity.ok(new BaseResponse<>(categoryService.findRoots(), null));
     }
 
@@ -49,7 +50,7 @@ public class CategoryController {
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Tạo Category", description = "API tạo Category mới, chỉ admin mới có quyền tạo")
-    public ResponseEntity<BaseResponse<Category>> addCategory(@RequestBody CreateCategoryRequest category) {
+    public ResponseEntity<BaseResponse<CategoryResponse>> addCategory(@RequestBody CreateCategoryRequest category) {
         return ResponseEntity.ok(new BaseResponse<>(categoryService.create(category), "Tao thanh cong"));
     }
 
@@ -68,7 +69,7 @@ public class CategoryController {
             summary = "Lấy danh sách Category For Admin",
             description = "API lấy danh sách tất cả Category dành cho ADMIN và STAFF"
     )
-    public ResponseEntity<BaseResponse<List<Category>>> getAllCategoryForAdmin() {
+    public ResponseEntity<BaseResponse<List<CategoryResponse>>> getAllCategoryForAdmin() {
         return ResponseEntity.ok(
                 new BaseResponse<>(categoryService.findAllForAdmin(), "Lấy danh sách thành công")
         );
@@ -79,7 +80,7 @@ public class CategoryController {
             summary = "Cập nhật Category",
             description = "API cập nhật thông tin Category theo id. ADMIN và STAFF có quyền cập nhật tên, mô tả, danh mục cha hoặc trạng thái hoạt động."
     )
-    public ResponseEntity<BaseResponse<Category>> updateCategory(
+    public ResponseEntity<BaseResponse<CategoryResponse>> updateCategory(
             @PathVariable Integer id,
             @RequestBody UpdateCategoryRequest request
     ) {
