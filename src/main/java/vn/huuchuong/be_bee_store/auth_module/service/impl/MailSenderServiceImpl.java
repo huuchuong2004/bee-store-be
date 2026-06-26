@@ -74,7 +74,7 @@ public class MailSenderServiceImpl implements IMailSenderService {
                          style="width:120px;border-radius:12px;border:1px solid #827193;margin-bottom:16px;" />
                 
                     <h2 style="color:#f8f8fa;font-size:20px;margin:0 0 12px 0;">
-                      Chào mừng bạn đến với LC-Store 💜
+                      Chào mừng bạn đến với OUTTA STORE 💜
                     </h2>
                 
                     <p style="color:#e8e6ee;font-size:14px;line-height:1.6;margin:0 0 24px 0;">
@@ -108,7 +108,7 @@ public class MailSenderServiceImpl implements IMailSenderService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(toEmail);
-            helper.setSubject("Đặt lại mật khẩu - LC Store");
+            helper.setSubject("Đặt lại mật khẩu - OUTTA STORE");
 
             String html = """
                 <!DOCTYPE html>

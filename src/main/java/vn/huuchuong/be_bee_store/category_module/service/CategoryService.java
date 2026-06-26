@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import vn.huuchuong.be_bee_store.category_module.entity.Category;
 import vn.huuchuong.be_bee_store.category_module.payload.request.CreateCategoryRequest;
+import vn.huuchuong.be_bee_store.category_module.payload.request.UpdateCategoryRequest;
 
 import java.util.List;
 
@@ -17,4 +18,10 @@ public interface CategoryService {
     Category create(CreateCategoryRequest category);
 
     Boolean delete(Integer id);
+
+    List<Category> findAllForAdmin();
+
+    Category update(Integer id, UpdateCategoryRequest request);
+
+    Boolean restore(Integer id);
 }

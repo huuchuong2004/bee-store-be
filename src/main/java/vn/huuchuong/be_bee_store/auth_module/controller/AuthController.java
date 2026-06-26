@@ -2,6 +2,7 @@ package vn.huuchuong.be_bee_store.auth_module.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Schema(name = "AuthController", description = "API cho các chức năng liên quan đến xác thực và quản lý tài khoản người dùng như đăng nhập, đăng ký, kích hoạt tài khoản, v.v.")
+@Tag(
+        name = "Quản lý Xác Thực",
+        description = "Nhóm API phục vụ quản lý liên quan đến xác thực người dùng, bao gồm đăng nhập, đăng ký, làm mới token, đăng xuất và quản lý tài khoản"
+)
 public class AuthController {
 
 

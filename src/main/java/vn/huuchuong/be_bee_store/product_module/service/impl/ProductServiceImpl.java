@@ -239,13 +239,13 @@ public class ProductServiceImpl implements ProductService {
         }
         variant.setSku(sku);
 
-        // 2. Lưu variant riêng để nó có ID (rất quan trọng)
+
         ProductVariant savedVariant = productVariantRepository.save(variant);
 
-        // 3. Đồng bộ lại vào list của product (cho mapper dùng)
+
         product.getVariants().add(savedVariant);
 
-        // 4. Tạo inventory liên kết với variant ĐÃ LƯU
+
         Inventory inventory = new Inventory();
         inventory.setProductVariant(savedVariant);
         inventory.setCurrentStockLevel(savedVariant.getQuantityInStock());
@@ -253,10 +253,10 @@ public class ProductServiceImpl implements ProductService {
 
         inventoryRepository.save(inventory);
 
-        // 5. (tuỳ chọn) Lưu lại product nếu bạn muốn đồng bộ 2 chiều
+
         productRepository.save(product);
 
-        // 6. Lấy product mới nhất để trả về
+
         Product productLatest = productRepository.findById(productId)
                 .orElseThrow(() -> new BusinessException("Sản phẩm không tồn tại"));
 
@@ -303,7 +303,7 @@ public class ProductServiceImpl implements ProductService {
         if (req.getColor() != null) variant.setColor(newColor);
         if (req.getPrice() != null) variant.setPrice(req.getPrice());
 
-        // 🔥 Update tồn kho trong inventory
+
         if (req.getQuantityInStock() != null) {
             if (req.getQuantityInStock() < 0) {
                 throw new BusinessException("Tồn kho không được âm");
@@ -340,18 +340,18 @@ public class ProductServiceImpl implements ProductService {
             throw new BusinessException("Biến thể không thuộc về sản phẩm này");
         }
 
-        // 4. Lấy inventory tương ứng
+
         Inventory inventory = inventoryRepository.findByProductVariant(variant)
                 .orElse(null);
 
-        // 5. Nếu còn tồn kho > 0 → cấm xóa
+
         if (inventory != null && inventory.getCurrentStockLevel() != null
                 && inventory.getCurrentStockLevel() > 0) {
             throw new BusinessException(
                     "Không thể xóa biến thể vì còn tồn kho: " + inventory.getCurrentStockLevel()
             );
         }
-        // 7. Xóa inventory nếu có
+
         if (inventory != null) {
             inventoryRepository.delete(inventory);
         }
@@ -360,7 +360,7 @@ public class ProductServiceImpl implements ProductService {
         productVariantRepository.delete(variant);
     }
 
-    // ======================== IMAGES: ADD ============================
+
 
     @Override
     @Transactional

@@ -20,9 +20,9 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("LC Store API Storage")
+                        .title("OUTTA Store API Storage")
                         .version("c.h.u.o.n.g.d.e.v")
-                        .description("LC Store")
+                        .description("OUTTA Store")
                         .termsOfService("https://www.facebook.com/huuchuongonthebeats/") // chọn 1 URL, đừng truyền 2 lần
                         .contact(new Contact().name("STU").email("huuchuong398@gmail.com"))
                         .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0.html"))

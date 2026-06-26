@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+import org.modelmapper.internal.bytebuddy.implementation.bind.annotation.Default;
 import vn.huuchuong.be_bee_store.base.BaseEntity;
 
 
@@ -16,10 +17,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+
 @Table(
         name = "category", uniqueConstraints = {@UniqueConstraint(name = "uq_category_name", columnNames = "name") }// dam bao ko co 2 user nao trugn email}// ngan trung du lieu
 )
+
 public class Category extends BaseEntity {
 
     @Id
@@ -30,6 +32,8 @@ public class Category extends BaseEntity {
     private String name;
 
     private String description;
+
+    private Boolean isActive = true;
 
     @ManyToOne
     @JsonIgnore

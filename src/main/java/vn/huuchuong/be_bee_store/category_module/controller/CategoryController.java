@@ -1,6 +1,7 @@
 package vn.huuchuong.be_bee_store.category_module.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,9 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import vn.huuchuong.be_bee_store.base.BaseResponse;
 import vn.huuchuong.be_bee_store.category_module.entity.Category;
 import vn.huuchuong.be_bee_store.category_module.payload.request.CreateCategoryRequest;
+import vn.huuchuong.be_bee_store.category_module.payload.request.UpdateCategoryRequest;
 import vn.huuchuong.be_bee_store.category_module.service.CategoryService;
 
 import java.util.List;
+@Tag(
+        name = "Quản lý Danh Mục",
+        description = "Nhóm API phục vụ quản lý liên quan đến Danh Mục, bao gồm tạo mới, xóa, lấy danh sách danh mục và cây danh mục"
+)
 
 @RestController
 @RequestMapping("/api/v1/categorys")
@@ -50,9 +56,49 @@ public class CategoryController {
     @Transactional
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @Operation(summary = "Xóa Category", description = "API xóa Category, chỉ admin mới có quyền xóa")
+    @Operation(summary = "Xóa Category", description = "API xóa Category, chỉ admin mới có quyền xóa ( Xóa Mềm ) ")
     public ResponseEntity<BaseResponse<Boolean>> deleteCategory(@PathVariable Integer id) {
         return ResponseEntity.ok(new BaseResponse<>(categoryService.delete(id), "Xoa thanh cong"));
 
     }
+
+    @GetMapping("/admin/all")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_STAFF')")
+    @Operation(
+            summary = "Lấy danh sách Category For Admin",
+            description = "API lấy danh sách tất cả Category dành cho ADMIN và STAFF"
+    )
+    public ResponseEntity<BaseResponse<List<Category>>> getAllCategoryForAdmin() {
+        return ResponseEntity.ok(
+                new BaseResponse<>(categoryService.findAllForAdmin(), "Lấy danh sách thành công")
+        );
+    }
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_STAFF')")
+    @Operation(
+            summary = "Cập nhật Category",
+            description = "API cập nhật thông tin Category theo id. ADMIN và STAFF có quyền cập nhật tên, mô tả, danh mục cha hoặc trạng thái hoạt động."
+    )
+    public ResponseEntity<BaseResponse<Category>> updateCategory(
+            @PathVariable Integer id,
+            @RequestBody UpdateCategoryRequest request
+    ) {
+        return ResponseEntity.ok(
+                new BaseResponse<>(categoryService.update(id, request), "Cập nhật danh mục thành công")
+        );
+    }
+
+    @PatchMapping("/{id}/restore")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_STAFF')")
+    @Operation(
+            summary = "Khôi phục Category",
+            description = "API khôi phục Category đã bị xóa mềm bằng cách chuyển trạng thái isActive từ false sang true. Nếu Category có danh mục con, hệ thống sẽ khôi phục cả các danh mục con."
+    )
+    public ResponseEntity<BaseResponse<Boolean>> restoreCategory(@PathVariable Integer id) {
+        return ResponseEntity.ok(
+                new BaseResponse<>(categoryService.restore(id), "Khôi phục danh mục thành công")
+        );
+    }
+
+
 }
