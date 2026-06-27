@@ -15,7 +15,10 @@ import vn.huuchuong.be_bee_store.popup_noti_module.service.CouponSuggestNotifica
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Quản Lý Thông Báo - Popup Trên Trang", description = "API hiển thị popup gợi ý coupon cho người dùng")
+@Tag(
+        name = "Quản Lý Thông Báo - Popup Coupon",
+        description = "Các API quản lý thông báo popup gợi ý coupon hiển thị trên trang"
+)
 @RequestMapping("/api/v1/popup-coupon")
 public class PopupCouponSuggetNotificationController {
 
@@ -23,15 +26,25 @@ public class PopupCouponSuggetNotificationController {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_STAFF','ADMIN','STAFF')")
-    @Operation(summary = "Hiển thị popup gợi ý coupon", description = "API hiển thị popup gợi ý coupon cho người dùng")
+    @Operation(
+            summary = "Lấy danh sách popup gợi ý coupon",
+            description = "API lấy toàn bộ danh sách thông báo popup gợi ý coupon đang có trong hệ thống"
+    )
     public Object coupon_sugget_notification() {
-        return ResponseEntity.ok(new BaseResponse<>(couponSuggestNotificationsService.getNoti(),"Lấy Thông Tin Của Thông Báo Thành CÔng"));
-
+        return ResponseEntity.ok(
+                new BaseResponse<>(
+                        couponSuggestNotificationsService.getNoti(),
+                        "Lấy thông tin của thông báo thành công"
+                )
+        );
     }
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_STAFF','ADMIN','STAFF')")
-    @Operation(summary = "Tạo thông báo gợi ý coupon", description = "API tạo thông báo gợi ý coupon cho người dùng")
+    @Operation(
+            summary = "Tạo popup gợi ý coupon",
+            description = "API tạo mới một thông báo popup gợi ý coupon cho người dùng"
+    )
     public ResponseEntity<BaseResponse<CouponSuggestNotificationResponse>> createCouponSuggestNotification(
             @Valid @RequestBody CouponSuggestNotificationsReq request) {
         return ResponseEntity.ok(
@@ -44,7 +57,12 @@ public class PopupCouponSuggetNotificationController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_STAFF','ADMIN','STAFF')")
-    ResponseEntity<BaseResponse<CouponSuggestNotificationResponse>> deleteCouponSuggestNotification(@PathVariable int id) {
+    @Operation(
+            summary = "Xóa popup gợi ý coupon",
+            description = "API xóa một thông báo popup gợi ý coupon theo ID"
+    )
+    public ResponseEntity<BaseResponse<CouponSuggestNotificationResponse>> deleteCouponSuggestNotification(
+            @PathVariable int id) {
         return ResponseEntity.ok(
                 BaseResponse.success(
                         couponSuggestNotificationsService.deleteCouponSuggestNotification(id),
@@ -55,12 +73,18 @@ public class PopupCouponSuggetNotificationController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_STAFF','ADMIN','STAFF')")
-    public ResponseEntity<BaseResponse<CouponSuggestNotificationResponse>> updateCouponSuggestNotification(@Valid @RequestBody UpdateCouponPopupRequest request, @PathVariable int id) {
+    @Operation(
+            summary = "Cập nhật popup gợi ý coupon",
+            description = "API cập nhật thông tin popup gợi ý coupon theo ID. Nếu field truyền vào rỗng thì giữ nguyên dữ liệu hiện tại"
+    )
+    public ResponseEntity<BaseResponse<CouponSuggestNotificationResponse>> updateCouponSuggestNotification(
+            @Valid @RequestBody UpdateCouponPopupRequest request,
+            @PathVariable int id) {
         return ResponseEntity.ok(
                 BaseResponse.success(
-                        couponSuggestNotificationsService.updateCouponPopup(request,id),
+                        couponSuggestNotificationsService.updateCouponPopup(request, id),
                         "Update thông báo gợi ý coupon thành công"
                 )
         );
     }
-}
+}add
