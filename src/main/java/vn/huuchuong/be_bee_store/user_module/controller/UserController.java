@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.huuchuong.be_bee_store.auth_module.entity.User;
 import vn.huuchuong.be_bee_store.base.BaseResponse;
 import vn.huuchuong.be_bee_store.user_module.payload.request.*;
+import vn.huuchuong.be_bee_store.user_module.payload.response.CountByRole;
 import vn.huuchuong.be_bee_store.user_module.payload.response.LoadUserResponse;
 import vn.huuchuong.be_bee_store.user_module.payload.response.UserResponse;
 import vn.huuchuong.be_bee_store.user_module.service.UserService;
@@ -40,7 +41,7 @@ public class UserController {
     )
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_STAFF','ADMIN','STAFF')")
-    public ResponseEntity<BaseResponse<List<User>>> getUsers(
+    public ResponseEntity<BaseResponse<Page<User>>> getUsers(
             @Parameter(description = "Thông tin phân trang. Mặc định size = 10, sort = username ASC")
             @PageableDefault(size = 10, sort = "username", direction = Sort.Direction.ASC)
             Pageable pageable
@@ -158,7 +159,7 @@ public class UserController {
     )
     @GetMapping("/count-by-role")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_STAFF','ADMIN','STAFF')")
-    public ResponseEntity<BaseResponse<Integer>> countUserByRole() {
+    public ResponseEntity<BaseResponse<CountByRole>> countUserByRole() {
         return ResponseEntity.ok(
                 new BaseResponse<>(userService.countUserByRole(), "Đếm số lượng user theo role thành công")
         );

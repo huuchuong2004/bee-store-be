@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import vn.huuchuong.be_bee_store.auth_module.entity.User;
 import vn.huuchuong.be_bee_store.base.BaseResponse;
 import vn.huuchuong.be_bee_store.user_module.payload.request.*;
+import vn.huuchuong.be_bee_store.user_module.payload.response.CountByRole;
 import vn.huuchuong.be_bee_store.user_module.payload.response.LoadUserResponse;
 import vn.huuchuong.be_bee_store.user_module.payload.response.UserResponse;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    List<User> getUsers(Pageable pageable);
+    
 
     LoadUserResponse loadUser(String username);
     BaseResponse deleteByUsername(String username);
@@ -30,5 +31,10 @@ public interface UserService {
     void patch(UUID id, @Valid ProfileUpdateRequest req);
 
 
-    Integer countUserByRole();
+
+
+
+    Page<User> getUsers(Pageable pageable);
+
+    CountByRole countUserByRole();
 }

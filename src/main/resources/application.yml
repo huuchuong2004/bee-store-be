@@ -43,7 +43,7 @@ logging:
 jwt:
   secret-base64: "kRZtO5/vUdtnabWGyd/N0CUU7h7ID4OK/OkxXi+j3Qxf7SV40PASQovBDnTIGAe4nSuonLwClVnwP1ucioXhFw=="
 
-  expiration-ms: 30000
+  expiration-ms: 500000
 
 app:
   frontend:

@@ -15,6 +15,7 @@ import vn.huuchuong.be_bee_store.auth_module.repository.UserRepository;
 import vn.huuchuong.be_bee_store.base.BaseResponse;
 import vn.huuchuong.be_bee_store.exception.BusinessException;
 import vn.huuchuong.be_bee_store.user_module.payload.request.*;
+import vn.huuchuong.be_bee_store.user_module.payload.response.CountByRole;
 import vn.huuchuong.be_bee_store.user_module.payload.response.LoadUserResponse;
 import vn.huuchuong.be_bee_store.user_module.payload.response.UpdateUserResponse;
 import vn.huuchuong.be_bee_store.user_module.payload.response.UserResponse;
@@ -32,10 +33,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
-    @Override
-    public List<User> getUsers(Pageable pageable) {
-        return userRepository.findAll(pageable).getContent();
-    }
+
 
     @Override
     public LoadUserResponse loadUser(String username) {
@@ -194,9 +192,37 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+
+
     @Override
-    public Integer countUserByRole() {
-        return userRepository.countUserByRole();
+    public Page<User> getUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
+    @Override
+    public CountByRole countUserByRole() {
+        List<User> users = userRepository.findAll();
+        int countAdmin = 0 ;
+        int countStaff = 0 ;
+        int  countUser = 0 ;
+        for (User user : users) {
+            if (user.getRole() == Role.ADMIN) {
+                countAdmin++;
+            }else if (user.getRole() == Role.STAFF) {
+                countStaff++;
+            } else if (user.getRole() == Role.USER) {
+                countUser++;
+
+            }
+
+
+
+        }
+        CountByRole countByRole = new CountByRole();
+        countByRole.setCount_user(countUser);
+        countByRole.setCount_admin(countAdmin);
+        countByRole.setCount_staff(countStaff);
+        return countByRole;
     }
 
 
