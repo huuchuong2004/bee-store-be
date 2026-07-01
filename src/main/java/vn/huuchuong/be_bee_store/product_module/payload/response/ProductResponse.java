@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 @Data
 public class ProductResponse {
-    private Integer productId;
 
+    private Integer productId;
     private String name;
     private String description;
     private BigDecimal baseprice;
@@ -18,6 +18,13 @@ public class ProductResponse {
 
     private List<String> imageUrls;
     private List<ProductVariantResponse> variants;
+
     private boolean deleted;
     private LocalDateTime deletedAt;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    private String createdBy;
+    private String lastModifiedBy;
 }

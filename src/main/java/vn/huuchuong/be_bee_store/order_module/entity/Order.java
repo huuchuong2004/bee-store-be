@@ -4,6 +4,7 @@ package vn.huuchuong.be_bee_store.order_module.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import vn.huuchuong.be_bee_store.auth_module.entity.User;
+import vn.huuchuong.be_bee_store.base.BaseEntity;
 import vn.huuchuong.be_bee_store.coupon_module.entity.Coupon;
 import vn.huuchuong.be_bee_store.order_module.Enum.OrderStatus;
 import vn.huuchuong.be_bee_store.payment_module.entity.Payment;
@@ -22,7 +23,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "orders")
-public class Order {
+public class Order extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

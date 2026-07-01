@@ -14,6 +14,8 @@ public interface CouponSuggestNotificationsService {
     CouponSuggestNotificationResponse deleteCouponSuggestNotification(int id);
 
     CouponSuggestNotificationResponse updateCouponPopup(@Valid UpdateCouponPopupRequest request, int id);
+
+
 }
 
    

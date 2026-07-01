@@ -105,7 +105,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryResponse update(Integer id, UpdateCategoryRequest request) {
         Category category = categoryRepository.findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new BusinessException("Không tìm thấy danh mục = " + id));
+                .orElseThrow(() -> new BusinessException("Không tìm thấy danh mục  hoặc danh mục hiện đang không được sẵn sàng= " + id));
 
         if (request.getName() != null && !request.getName().isBlank()) {
             String newName = request.getName().trim();

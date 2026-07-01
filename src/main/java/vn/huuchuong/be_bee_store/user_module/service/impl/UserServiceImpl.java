@@ -47,10 +47,11 @@ public class UserServiceImpl implements UserService {
     public BaseResponse deleteByUsername(String username) {
         User user =userRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException("User not found"));
-        userRepository.delete(user);
+       user.setIsActive(false);
+       userRepository.save(user);
         BaseResponse baseResponse = new BaseResponse();
         baseResponse.setData(null);
-        baseResponse.setMessage("User deleted successfully");
+        baseResponse.setMessage("User locked successfully");
         return baseResponse;
     }
 

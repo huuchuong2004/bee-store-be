@@ -87,4 +87,19 @@ public class PopupCouponSuggetNotificationController {
                 )
         );
     }
-}add
+//    @GetMapping("/{id}")
+//    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_STAFF','ADMIN','STAFF')")
+//    @Operation(
+//            summary = "Lấy chi tiết popup gợi ý coupon",
+//            description = "API lấy chi tiết một thông báo popup gợi ý coupon theo ID"
+//    )
+//    public ResponseEntity<BaseResponse<CouponSuggestNotificationResponse>> getCouponSuggestNotificationById(
+//            @PathVariable int id) {
+//        return ResponseEntity.ok(
+//                BaseResponse.success(
+//                        couponSuggestNotificationsService.getById(id),
+//                        "Lấy chi tiết thông báo gợi ý coupon thành công"
+//                )
+//        );
+//    }
+}

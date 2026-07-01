@@ -1,8 +1,12 @@
 package vn.huuchuong.be_bee_store.popup_noti_module.payload.response;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CouponSuggestNotificationResponse {
 
     private int id;

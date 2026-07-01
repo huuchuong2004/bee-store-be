@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 @Data
 public class ProductListResponse {
+
     private Integer productId;
 
     private String name;
@@ -17,6 +18,13 @@ public class ProductListResponse {
     private String categoryName;
 
     private List<String> imageUrls;
+
     private boolean deleted;
     private LocalDateTime deletedAt;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    private String createdBy;
+    private String lastModifiedBy;
 }

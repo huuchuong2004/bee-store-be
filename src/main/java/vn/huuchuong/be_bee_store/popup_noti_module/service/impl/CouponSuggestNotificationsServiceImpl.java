@@ -29,7 +29,7 @@ public class CouponSuggestNotificationsServiceImpl implements CouponSuggestNotif
 
         return lists.stream().map(noti -> {
             CouponSuggestNotificationResponse response = new CouponSuggestNotificationResponse();
-            response.setId(noti.getCoupon_suggest_notification_id());
+            response.setId(noti.getId());
             response.setHeader(noti.getHeader());
             response.setTitle(noti.getTitle());
             response.setDescription(noti.getDescription());
@@ -72,11 +72,13 @@ public class CouponSuggestNotificationsServiceImpl implements CouponSuggestNotif
         CouponSuggestNotification saved = couponSuggestNotificationsRepository.save(couponSuggestNotification);
 
         CouponSuggestNotificationResponse response = new CouponSuggestNotificationResponse();
-        response.setId(saved.getCoupon_suggest_notification_id());
+        response.setId(saved.getId());
         response.setHeader(saved.getHeader());
         response.setTitle(saved.getTitle());
         response.setDescription(saved.getDescription());
 
         return response;
     }
+
+
 }

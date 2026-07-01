@@ -17,28 +17,34 @@ import vn.huuchuong.be_bee_store.product_module.payload.response.ProductVariantR
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
     @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "category.name", target = "categoryName")
-    @Mapping(source = "images", target = "imageUrls", qualifiedByName = "mapImagesToUrls")
+    @Mapping(source = "images", target = "imageUrls",
+            qualifiedByName = "mapImagesToUrls")
     ProductResponse toProductResponse(Product product);
 
     @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "category.name", target = "categoryName")
-    @Mapping(source = "images", target = "imageUrls", qualifiedByName = "mapImagesToUrls")
+    @Mapping(source = "images", target = "imageUrls",
+            qualifiedByName = "mapImagesToUrls")
     ProductListResponse toProductListResponse(Product product);
 
     ProductVariantResponse toProductVariantResponse(ProductVariant variant);
 
     @Named("mapImagesToUrls")
     default List<String> mapImagesToUrls(List<ProductImage> images) {
-        if (images == null) return Collections.emptyList();
+        if (images == null) {
+            return Collections.emptyList();
+        }
+
         return images.stream()
                 .map(ProductImage::getImageURL)
-                .filter(url -> url != null)
-                .collect(Collectors.toList());
+                .filter(Objects::nonNull)
+                .toList();
     }
 }

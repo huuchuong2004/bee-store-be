@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import vn.huuchuong.be_bee_store.base.BaseEntity;
 
 @Entity
 @Table(name = "coupon_suggest_notifications")
@@ -12,18 +13,22 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class CouponSuggestNotification {
+public class CouponSuggestNotification extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int coupon_suggest_notification_id;
+    @Column(name = "coupon_suggest_notification_id")
+    private Integer id;
 
+    @Column(length = 255)
     private String header;
 
+    @Column(length = 255)
     private String title;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-
+    @Column(nullable = false)
+    private boolean status = true;
 }

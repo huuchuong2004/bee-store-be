@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import vn.huuchuong.be_bee_store.base.BaseEntity;
 import vn.huuchuong.be_bee_store.category_module.entity.Category;
 
 import java.math.BigDecimal;
@@ -20,7 +21,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name="products",uniqueConstraints = {@UniqueConstraint(name = "uq_products_name", columnNames = "name")})
-public class Product {
+public class Product extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +33,8 @@ public class Product {
 
     private String name;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private BigDecimal baseprice;
